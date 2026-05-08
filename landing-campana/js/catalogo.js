@@ -244,3 +244,27 @@ document.addEventListener("click", (e) => {
     cerrarImagen();
   }
 });
+function filtrarProductos(categoriaFiltro) {
+  const botones = document.querySelectorAll(".filtro");
+
+  botones.forEach((btn) => btn.classList.remove("activo"));
+
+  const botonActivo = [...botones].find((btn) =>
+    btn.textContent.trim().toLowerCase() === categoriaFiltro.toLowerCase()
+  );
+
+  if (categoriaFiltro === "todos") {
+    document.querySelector(".filtro")?.classList.add("activo");
+    mostrarProductos(productos);
+    return;
+  }
+
+  if (botonActivo) botonActivo.classList.add("activo");
+
+  const filtrados = productos.filter((producto) => {
+    const categoria = producto.categoria || producto.Categoria || "";
+    return categoria.toLowerCase().includes(categoriaFiltro.toLowerCase());
+  });
+
+  mostrarProductos(filtrados);
+}

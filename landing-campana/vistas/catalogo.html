@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,6 +26,12 @@
   <section class="hero-catalogo">
     <h1>Nuestro Catálogo</h1>
     <p>Descubre todas nuestras prendas elegantes y modernas</p>
+  </section>
+    <section class="barra-filtros">
+    <button class="filtro activo" onclick="filtrarProductos('todos')">Todos</button>
+    <button class="filtro" onclick="filtrarProductos('Pijamas')">Pijamas</button>
+    <button class="filtro" onclick="filtrarProductos('Mallas')">Mallas</button>
+    <button class="filtro" onclick="filtrarProductos('Lencería')">Lencería</button>
   </section>
 
   <main class="contenedor-principal">
@@ -52,17 +59,18 @@
   </footer>
   <div class="modal-imagen" id="modal-imagen">
 
-  <span class="cerrar-modal" id="cerrar-modal">×</span>
+    <span class="cerrar-modal" id="cerrar-modal">×</span>
 
-  <img id="imagen-modal" src="" alt="Imagen producto">
+    <img id="imagen-modal" src="" alt="Imagen producto">
 
-</div>
-<div class="modal-imagen" id="modal-imagen">
-  <span class="cerrar-modal" id="cerrar-modal">×</span>
-  <img id="imagen-modal" src="" alt="Imagen producto">
-</div>
+  </div>
+  <div class="modal-imagen" id="modal-imagen">
+    <span class="cerrar-modal" id="cerrar-modal">×</span>
+    <img id="imagen-modal" src="" alt="Imagen producto">
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <script src="../js/catalogo.js"></script>
 </body>
+
 </html>

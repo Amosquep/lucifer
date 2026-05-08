@@ -388,3 +388,69 @@ footer{
 .producto-img{
   cursor:pointer;
 }
+.barra-filtros{
+  position:sticky;
+  top:80px;
+  z-index:900;
+  background:rgba(17,17,17,.96);
+  backdrop-filter:blur(10px);
+  padding:16px 20px;
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  flex-wrap:wrap;
+  border-bottom:2px solid #D4AF37;
+}
+
+.filtro{
+  background:#8B0000;
+  color:#D4AF37;
+  border:1px solid #D4AF37;
+  padding:11px 20px;
+  border-radius:999px;
+  cursor:pointer;
+  font-weight:bold;
+  letter-spacing:.5px;
+  transition:.3s;
+}
+
+.filtro:hover,
+.filtro.activo{
+  background:#D4AF37;
+  color:#111;
+  transform:translateY(-2px);
+}
+
+.producto-card{
+  position:relative;
+}
+
+.producto-card::before{
+  content:"PREMIUM";
+  position:absolute;
+  top:14px;
+  left:14px;
+  z-index:2;
+  background:linear-gradient(135deg,#D4AF37,#fff1a8,#D4AF37);
+  color:#111;
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:1px;
+  box-shadow:0 4px 12px rgba(0,0,0,.25);
+}
+
+@media(max-width:768px){
+  .barra-filtros{
+    top:70px;
+    justify-content:flex-start;
+    overflow-x:auto;
+    flex-wrap:nowrap;
+  }
+
+  .filtro{
+    white-space:nowrap;
+  }
+}
+
