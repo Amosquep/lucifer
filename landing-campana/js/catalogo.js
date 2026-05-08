@@ -52,11 +52,13 @@ function mostrarProductos(lista) {
   contenedor.innerHTML = "";
 
   lista.forEach((producto, index) => {
+    console.log(producto);
     const categoria = producto.categoria || producto.Categoria || "";
     const nombre = producto.nombre || producto.Nombre || `Producto ${index + 1}`;
     const talla = producto.talla || producto.Talla || "";
     const precio = Number(producto.precio || producto.Precio || 0);
     const imagen = producto.imagen || producto.Imagen || "";
+    
 
     const card = document.createElement("div");
     card.classList.add("producto-card");
@@ -98,7 +100,7 @@ function agregarAlCarrito(index) {
     categoria: producto.categoria || producto.Categoria || "",
     nombre: producto.nombre || producto.Nombre || `Producto ${index + 1}`,
     talla: producto.talla || producto.Talla || "",
-    precio: Number(producto.precio || producto.Precio || 0),
+    precio: Number(producto.precio || producto.precio || 0),
   };
 
   carrito.push(item);
