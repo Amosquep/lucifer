@@ -48,7 +48,7 @@ function mostrarProductos(lista) {
     card.classList.add("producto-card");
 
     card.innerHTML = `
-      <img src="/lucifer/landing-campana/${imagen}"
+     <img src="/lucifer/landing-campana/${imagen}" alt="${nombre}" class="producto-img">
 
       <div class="producto-info">
         <span class="producto-categoria">${categoria}</span>
