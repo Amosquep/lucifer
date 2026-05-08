@@ -62,7 +62,12 @@ function mostrarProductos(lista) {
     card.classList.add("producto-card");
 
     card.innerHTML = `
-      <img src="/lucifer/landing-campana/${imagen}" alt="${nombre}" class="producto-img">
+      <img 
+        src="/lucifer/landing-campana/${imagen}" 
+         alt="${nombre}" 
+         class="producto-img"
+           onclick="abrirImagen(this.src)"
+      >
 
       <div class="producto-info">
         <span class="producto-categoria">${categoria}</span>
@@ -186,3 +191,33 @@ function pagarWhatsApp() {
 function formatearPrecio(valor) {
   return Number(valor).toLocaleString("es-CO");
 }
+function abrirImagen(src){
+
+  const modal = document.getElementById("modal-imagen");
+  const imagen = document.getElementById("imagen-modal");
+
+  imagen.src = src;
+
+  modal.classList.add("activo");
+}
+
+function cerrarImagen(){
+
+  document
+    .getElementById("modal-imagen")
+    .classList.remove("activo");
+}
+
+document
+  .getElementById("cerrar-modal")
+  ?.addEventListener("click", cerrarImagen);
+
+document
+  .getElementById("modal-imagen")
+  ?.addEventListener("click", (e)=>{
+
+    if(e.target.id === "modal-imagen"){
+      cerrarImagen();
+    }
+
+});

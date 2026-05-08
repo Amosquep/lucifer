@@ -337,3 +337,54 @@ footer{
   color:#777;
   padding:20px 0;
 }
+.modal-imagen{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.92);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  visibility:hidden;
+  transition:.3s;
+  z-index:3000;
+  padding:20px;
+}
+
+.modal-imagen.activo{
+  opacity:1;
+  visibility:visible;
+}
+
+.modal-imagen img{
+  max-width:90%;
+  max-height:90vh;
+  border-radius:18px;
+  box-shadow:0 0 25px rgba(0,0,0,.5);
+  animation:zoomImagen .3s ease;
+}
+
+@keyframes zoomImagen{
+  from{
+    transform:scale(.8);
+    opacity:0;
+  }
+  to{
+    transform:scale(1);
+    opacity:1;
+  }
+}
+
+.cerrar-modal{
+  position:absolute;
+  top:25px;
+  right:35px;
+  color:white;
+  font-size:50px;
+  cursor:pointer;
+  z-index:3001;
+}
+
+.producto-img{
+  cursor:pointer;
+}
