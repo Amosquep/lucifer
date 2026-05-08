@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,7 +18,7 @@
       <a href="#catalogo">Catálogo</a>
     </nav>
 
-    <a href="#carrito" class="carrito-header" aria-label="Ver carrito">
+    <a href="#" class="carrito-header" id="btn-carrito" aria-label="Ver carrito">
       🛒 <span id="contador-carrito">0</span>
     </a>
   </header>
@@ -27,20 +28,22 @@
     <p>Descubre todas nuestras prendas elegantes y modernas</p>
   </section>
 
-  <main class="contenedor-principal">
-    <section id="catalogo"></section>
+  <div class="overlay-carrito" id="overlay-carrito"></div>
 
-    <aside class="carrito-panel" id="carrito">
-      <h2>🛒 Carrito</h2>
-      <ul id="lista-carrito"></ul>
-      <p class="total">Total: $<span id="total">0</span></p>
+  <aside class="carrito-modal" id="carrito">
+    <button class="cerrar-carrito" type="button" onclick="cerrarCarrito()">×</button>
 
-      <div class="botones-carrito">
-        <button type="button" class="btn-vaciar" onclick="vaciarCarrito()">Vaciar</button>
-        <button type="button" class="btn-pagar" onclick="pagarWhatsApp()">Pagar</button>
-      </div>
-    </aside>
-  </main>
+    <h2>🛒 Detalle del pedido</h2>
+    <ul id="lista-carrito"></ul>
+
+    <p class="total">Total: $<span id="total">0</span></p>
+
+    <div class="botones-carrito">
+      <button type="button" class="btn-vaciar" onclick="vaciarCarrito()">Vaciar carrito</button>
+      <button type="button" class="btn-pagar" onclick="pagarWhatsApp()">Pedir por WhatsApp</button>
+    </div>
+  </aside>
+
 
   <footer>
     <p>&copy; 2026 Lucifer. Todos los derechos reservados.</p>
@@ -49,4 +52,5 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <script src="../js/catalogo.js"></script>
 </body>
+
 </html>

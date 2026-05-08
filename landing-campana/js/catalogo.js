@@ -2,9 +2,25 @@ const RUTA_EXCEL = "https://docs.google.com/spreadsheets/d/10_rQEbAjx7HA-NF7_L2k
 const TELEFONO_WHATSAPP = "573504444527";
 
 let productos = [];
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 
 document.addEventListener("DOMContentLoaded", () => {
   cargarProductos();
+  actualizarCarrito();
+
+  const btnCarrito = document.getElementById("btn-carrito");
+  const overlay = document.getElementById("overlay-carrito");
+
+  if (btnCarrito) {
+    btnCarrito.addEventListener("click", (e) => {
+      e.preventDefault();
+      abrirCarrito();
+    });
+  }
+
+  if (overlay) {
+    overlay.addEventListener("click", cerrarCarrito);
+  }
 });
 
 async function cargarProductos() {
@@ -31,10 +47,7 @@ async function cargarProductos() {
 function mostrarProductos(lista) {
   const contenedor = document.getElementById("catalogo");
 
-  if (!contenedor) {
-    console.error("No existe un contenedor con id='catalogo'");
-    return;
-  }
+  if (!contenedor) return;
 
   contenedor.innerHTML = "";
 
@@ -42,12 +55,8 @@ function mostrarProductos(lista) {
     const categoria = producto.categoria || producto.Categoria || "";
     const nombre = producto.nombre || producto.Nombre || `Producto ${index + 1}`;
     const talla = producto.talla || producto.Talla || "";
-    const precio = producto.precio || producto.Precio || "";
+    const precio = Number(producto.precio || producto.Precio || 0);
     const imagen = producto.imagen || producto.Imagen || "";
-
-    const mensaje = encodeURIComponent(
-      `Hola, quiero información de este producto:\n\n${nombre}\nCategoría: ${categoria}\nTalla: ${talla}\nPrecio: $${precio}`
-    );
 
     const card = document.createElement("div");
     card.classList.add("producto-card");
@@ -59,14 +68,14 @@ function mostrarProductos(lista) {
         <span class="producto-categoria">${categoria}</span>
         <h3>${nombre}</h3>
         <p><strong>Talla:</strong> ${talla}</p>
-        <p class="producto-precio">$${precio}</p>
+        <p class="producto-precio">$${formatearPrecio(precio)}</p>
 
-        <a 
-          href="https://wa.me/${TELEFONO_WHATSAPP}?text=${mensaje}" 
-          target="_blank" 
-          class="btn-whatsapp">
-          Pedir por WhatsApp
-        </a>
+        <button 
+          type="button"
+          class="btn-agregar"
+          onclick="agregarAlCarrito(${index})">
+          Agregar al carrito
+        </button>
       </div>
     `;
 
@@ -74,13 +83,106 @@ function mostrarProductos(lista) {
   });
 }
 
+function agregarAlCarrito(index) {
+  const producto = productos[index];
+
+  const item = {
+    categoria: producto.categoria || producto.Categoria || "",
+    nombre: producto.nombre || producto.Nombre || `Producto ${index + 1}`,
+    talla: producto.talla || producto.Talla || "",
+    precio: Number(producto.precio || producto.Precio || 0),
+  };
+
+  carrito.push(item);
+  localStorage.setItem("carrito", JSON.stringify(carrito));
+
+  actualizarCarrito();
+  animarCarrito();
+}
+
+function actualizarCarrito() {
+  const lista = document.getElementById("lista-carrito");
+  const totalHTML = document.getElementById("total");
+  const contador = document.getElementById("contador-carrito");
+
+  if (!lista || !totalHTML || !contador) return;
+
+  lista.innerHTML = "";
+
+  if (carrito.length === 0) {
+    lista.innerHTML = `<li class="carrito-vacio">Tu carrito está vacío.</li>`;
+  }
+
+  let total = 0;
+
+  carrito.forEach((item, i) => {
+    total += item.precio;
+
+    const li = document.createElement("li");
+    li.classList.add("item-carrito");
+
+    li.innerHTML = `
+      <strong>${i + 1}. ${item.nombre}</strong>
+      <small>Categoría: ${item.categoria}</small>
+      <small>Talla: ${item.talla}</small>
+      <small>Precio: $${formatearPrecio(item.precio)}</small>
+    `;
+
+    lista.appendChild(li);
+  });
+
+  totalHTML.textContent = formatearPrecio(total);
+  contador.textContent = carrito.length;
+}
+
+function abrirCarrito() {
+  document.getElementById("carrito")?.classList.add("activo");
+  document.getElementById("overlay-carrito")?.classList.add("activo");
+}
+
+function cerrarCarrito() {
+  document.getElementById("carrito")?.classList.remove("activo");
+  document.getElementById("overlay-carrito")?.classList.remove("activo");
+}
+
+function animarCarrito() {
+  const btnCarrito = document.getElementById("btn-carrito");
+  if (!btnCarrito) return;
+
+  btnCarrito.classList.remove("animar");
+  void btnCarrito.offsetWidth;
+  btnCarrito.classList.add("animar");
+}
+
 function vaciarCarrito() {
-  document.getElementById("lista-carrito").innerHTML = "";
-  document.getElementById("total").textContent = "0";
-  document.getElementById("contador-carrito").textContent = "0";
+  carrito = [];
+  localStorage.removeItem("carrito");
+  actualizarCarrito();
 }
 
 function pagarWhatsApp() {
-  const mensaje = encodeURIComponent("Hola, quiero finalizar mi pedido.");
+  if (carrito.length === 0) {
+    alert("Tu carrito está vacío.");
+    return;
+  }
+
+  let total = 0;
+  let detalle = "Hola, quiero hacer este pedido:\n\n";
+
+  carrito.forEach((item, i) => {
+    total += item.precio;
+    detalle += `${i + 1}. ${item.nombre}\n`;
+    detalle += `Categoría: ${item.categoria}\n`;
+    detalle += `Talla: ${item.talla}\n`;
+    detalle += `Precio: $${formatearPrecio(item.precio)}\n\n`;
+  });
+
+  detalle += `Total: $${formatearPrecio(total)}`;
+
+  const mensaje = encodeURIComponent(detalle);
   window.open(`https://wa.me/${TELEFONO_WHATSAPP}?text=${mensaje}`, "_blank");
+}
+
+function formatearPrecio(valor) {
+  return Number(valor).toLocaleString("es-CO");
 }
