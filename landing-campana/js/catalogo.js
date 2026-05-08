@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function cargarProductos() {
+  const contenedor = document.getElementById("catalogo");
+
   try {
     const respuesta = await fetch(RUTA_EXCEL);
     const data = await respuesta.arrayBuffer();
@@ -19,9 +21,10 @@ async function cargarProductos() {
     mostrarProductos(productos);
   } catch (error) {
     console.error("Error cargando catálogo:", error);
-    document.getElementById("catalogo").innerHTML = `
-      <p class="error">No se pudo cargar el catálogo.</p>
-    `;
+
+    if (contenedor) {
+      contenedor.innerHTML = `<p class="error">No se pudo cargar el catálogo.</p>`;
+    }
   }
 }
 
@@ -42,13 +45,15 @@ function mostrarProductos(lista) {
     const precio = producto.precio || producto.Precio || "";
     const imagen = producto.imagen || producto.Imagen || "";
 
-    const mensaje = `Hola, quiero información de este producto:%0A%0A${nombre}%0ACategoría: ${categoria}%0ATalla: ${talla}%0APrecio: $${precio}`;
+    const mensaje = encodeURIComponent(
+      `Hola, quiero información de este producto:\n\n${nombre}\nCategoría: ${categoria}\nTalla: ${talla}\nPrecio: $${precio}`
+    );
 
     const card = document.createElement("div");
     card.classList.add("producto-card");
 
     card.innerHTML = `
-     <img src="/lucifer/landing-campana/${imagen}" alt="${nombre}" class="producto-img">
+      <img src="/lucifer/landing-campana/${imagen}" alt="${nombre}" class="producto-img">
 
       <div class="producto-info">
         <span class="producto-categoria">${categoria}</span>
@@ -67,4 +72,15 @@ function mostrarProductos(lista) {
 
     contenedor.appendChild(card);
   });
+}
+
+function vaciarCarrito() {
+  document.getElementById("lista-carrito").innerHTML = "";
+  document.getElementById("total").textContent = "0";
+  document.getElementById("contador-carrito").textContent = "0";
+}
+
+function pagarWhatsApp() {
+  const mensaje = encodeURIComponent("Hola, quiero finalizar mi pedido.");
+  window.open(`https://wa.me/${TELEFONO_WHATSAPP}?text=${mensaje}`, "_blank");
 }

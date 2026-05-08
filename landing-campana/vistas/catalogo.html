@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,46 +8,29 @@
 </head>
 
 <body>
-  <div id="catalogo"></div>
-  <header class="header">
-    <nav class="navbar">
-      <h2 class="logo">Lucifer</h2>
 
-      <ul>
-        <li><a href="../index.html">Inicio</a></li>
-        <li><a href="#catalogo-productos">Catálogo</a></li>
-        <li>
-          <a href="#carrito" class="icono-carrito" aria-label="Ver carrito">
-            🛒 <span id="contador-carrito">0</span>
-          </a>
-        </li>
-      </ul>
+  <header class="header">
+    <a href="../index.html" class="logo">LUCIFER</a>
+
+    <nav class="navbar">
+      <a href="../index.html">Inicio</a>
+      <a href="#catalogo">Catálogo</a>
     </nav>
 
-    <div class="header-content">
-      <h1>Nuestro Catálogo</h1>
-      <p>Descubre todas nuestras prendas elegantes y modernas</p>
-    </div>
+    <a href="#carrito" class="carrito-header" aria-label="Ver carrito">
+      🛒 <span id="contador-carrito">0</span>
+    </a>
   </header>
 
-  <header class="header">
+  <section class="hero-catalogo">
+    <h1>Nuestro Catálogo</h1>
+    <p>Descubre todas nuestras prendas elegantes y modernas</p>
+  </section>
 
-  <div class="logo">
-    LUCIFER
-  </div>
-
-  <div class="carrito">
-    🛒
-    <span>0</span>
-  </div>
-
-</header>
-
-  <div id="catalogo"></div>
   <main class="contenedor-principal">
-    <section class="catalogo" id="catalogo-productos"></section>
+    <section id="catalogo"></section>
 
-    <aside class="carrito" id="carrito">
+    <aside class="carrito-panel" id="carrito">
       <h2>🛒 Carrito</h2>
       <ul id="lista-carrito"></ul>
       <p class="total">Total: $<span id="total">0</span></p>
@@ -67,5 +49,4 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <script src="../js/catalogo.js"></script>
 </body>
-
 </html>
