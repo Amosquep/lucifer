@@ -60,6 +60,9 @@ function mostrarProductos(lista) {
 
     const card = document.createElement("div");
     card.classList.add("producto-card");
+    card.addEventListener("click", () => {
+      abrirImagen(`/lucifer/landing-campana/${imagen}`);
+    });
 
     card.innerHTML = `
       <img 
@@ -191,7 +194,7 @@ function pagarWhatsApp() {
 function formatearPrecio(valor) {
   return Number(valor).toLocaleString("es-CO");
 }
-function abrirImagen(src){
+function abrirImagen(src) {
 
   const modal = document.getElementById("modal-imagen");
   const imagen = document.getElementById("imagen-modal");
@@ -201,7 +204,7 @@ function abrirImagen(src){
   modal.classList.add("activo");
 }
 
-function cerrarImagen(){
+function cerrarImagen() {
 
   document
     .getElementById("modal-imagen")
@@ -214,10 +217,30 @@ document
 
 document
   .getElementById("modal-imagen")
-  ?.addEventListener("click", (e)=>{
+  ?.addEventListener("click", (e) => {
 
-    if(e.target.id === "modal-imagen"){
+    if (e.target.id === "modal-imagen") {
       cerrarImagen();
     }
 
+  });
+  function abrirImagen(src){
+  const modal = document.getElementById("modal-imagen");
+  const imagenModal = document.getElementById("imagen-modal");
+
+  if (!modal || !imagenModal) return;
+
+  imagenModal.src = src;
+  modal.classList.add("activo");
+}
+
+function cerrarImagen(){
+  const modal = document.getElementById("modal-imagen");
+  if (modal) modal.classList.remove("activo");
+}
+
+document.addEventListener("click", (e) => {
+  if (e.target.id === "cerrar-modal" || e.target.id === "modal-imagen") {
+    cerrarImagen();
+  }
 });
