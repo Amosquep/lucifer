@@ -176,7 +176,14 @@ function actualizarCarrito() {
       <small>Categoría: ${item.categoria}</small>
       <small>Talla: ${item.talla}</small>
       <small>Precio: $${formatearPrecio(item.precio)}</small>
-    `;
+
+      <button 
+        type="button" 
+        class="btn-eliminar" 
+        onclick="eliminarDelCarrito(${i})">
+        Eliminar
+      </button>
+`;
 
     lista.appendChild(li);
   });
@@ -322,4 +329,9 @@ function normalizarTexto(texto) {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
+}
+function eliminarDelCarrito(index) {
+  carrito.splice(index, 1);
+  guardarCarrito();
+  actualizarCarrito();
 }
