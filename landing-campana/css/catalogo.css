@@ -43,13 +43,27 @@ body{
   border-bottom:1px solid rgba(214,179,106,.45);
 }
 
-.logo{
+.logo-container{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  text-decoration:none;
+}
+
+.logo-img{
+  width:52px;
+  height:52px;
+  object-fit:contain;
+  border-radius:50%;
+  box-shadow:0 4px 18px rgba(0,0,0,.35);
+}
+
+.logo-text{
   color:var(--dorado);
   font-family:'Cormorant Garamond', serif;
   font-size:34px;
   font-weight:700;
   letter-spacing:4px;
-  text-decoration:none;
 }
 
 .navbar{
@@ -481,6 +495,15 @@ footer{
 /* RESPONSIVE */
 
 @media(max-width:768px){
+  .logo-img{
+  width:42px;
+  height:42px;
+}
+
+.logo-text{
+  font-size:24px;
+  letter-spacing:2px;
+}
 
   .header{
     height:72px;
