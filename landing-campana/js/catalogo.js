@@ -8,19 +8,18 @@ document.addEventListener("DOMContentLoaded", () => {
   cargarProductos();
   actualizarCarrito();
 
-  const btnCarrito = document.getElementById("btn-carrito");
-  const overlay = document.getElementById("overlay-carrito");
+  document.getElementById("btn-carrito")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    abrirCarrito();
+  });
 
-  if (btnCarrito) {
-    btnCarrito.addEventListener("click", (e) => {
-      e.preventDefault();
-      abrirCarrito();
-    });
-  }
+  document.getElementById("overlay-carrito")?.addEventListener("click", cerrarCarrito);
 
-  if (overlay) {
-    overlay.addEventListener("click", cerrarCarrito);
-  }
+  document.addEventListener("click", (e) => {
+    if (e.target.id === "cerrar-modal" || e.target.id === "modal-imagen") {
+      cerrarImagen();
+    }
+  });
 });
 
 async function cargarProductos() {
@@ -32,25 +31,22 @@ async function cargarProductos() {
 
     const workbook = XLSX.read(data, { type: "array" });
     const hoja = workbook.Sheets[workbook.SheetNames[0]];
+
     productos = XLSX.utils.sheet_to_json(hoja);
 
     productos.sort((a, b) => {
-
       const orden = {
-        "Lencería": 1,
-        "Lenceria": 1,
-        "Pijamas": 2,
-        "Mallas": 3
+        lenceria: 1,
+        "lencería": 1,
+        pijamas: 2,
+        mallas: 3
       };
 
-      const categoriaA = a.categoria || a.Categoria || "";
-      const categoriaB = b.categoria || b.Categoria || "";
+      const categoriaA = normalizarTexto(a.categoria || a.Categoria || "");
+      const categoriaB = normalizarTexto(b.categoria || b.Categoria || "");
 
       return (orden[categoriaA] || 99) - (orden[categoriaB] || 99);
-
     });
-
-    mostrarProductos(productos);
 
     mostrarProductos(productos);
   } catch (error) {
@@ -64,37 +60,31 @@ async function cargarProductos() {
 
 function mostrarProductos(lista) {
   const contenedor = document.getElementById("catalogo");
-
   if (!contenedor) return;
 
   contenedor.innerHTML = "";
 
   lista.forEach((producto, index) => {
-    console.log(producto);
     const categoria = producto.categoria || producto.Categoria || "";
     const nombre = producto.nombre || producto.Nombre || `Producto ${index + 1}`;
-    const tallasDisponibles = obtenerTallas(talla);
-    const selectorTallas = tallasDisponibles.length > 1
-      ? `
-    <select class="select-talla" id="talla-${index}">
-      <option value="">Elige tu talla</option>
-      ${tallasDisponibles.map(t => `<option value="${t}">${t}</option>`).join("")}
-    </select>
-  `
-      : "";
-    const precioTexto = producto.precio || producto.Precio || "0";
-
-    const precio = Number(
-      precioTexto
-        .replace("$", "")
-        .replace(/\./g, "")
-        .replace(",", "")
-    );
+    const talla = producto.talla || producto.Talla || "";
+    const precio = convertirPrecio(producto.precio || producto.Precio || "0");
     const imagen = producto.imagen || producto.Imagen || "";
 
+    const tallasDisponibles = obtenerTallas(talla);
+
+    const selectorTallas = tallasDisponibles.length > 1
+      ? `
+        <select class="select-talla" id="talla-${index}" onclick="event.stopPropagation()">
+          <option value="">Elige tu talla</option>
+          ${tallasDisponibles.map(t => `<option value="${t}">${t}</option>`).join("")}
+        </select>
+      `
+      : "";
 
     const card = document.createElement("div");
     card.classList.add("producto-card");
+
     card.addEventListener("click", () => {
       abrirImagen(`/lucifer/landing-campana/${imagen}`);
     });
@@ -102,9 +92,9 @@ function mostrarProductos(lista) {
     card.innerHTML = `
       <img 
         src="/lucifer/landing-campana/${imagen}" 
-         alt="${nombre}" 
-         class="producto-img"
-           onclick="abrirImagen(this.src)"
+        alt="${nombre}" 
+        class="producto-img"
+        loading="lazy"
       >
 
       <div class="producto-info">
@@ -133,9 +123,7 @@ function agregarAlCarrito(index) {
   const categoria = producto.categoria || producto.Categoria || "";
   const nombre = producto.nombre || producto.Nombre || `Producto ${index + 1}`;
   const tallaTexto = producto.talla || producto.Talla || "";
-
-  const precioTexto = producto.precio || producto.Precio || "0";
-  const precio = convertirPrecio(precioTexto);
+  const precio = convertirPrecio(producto.precio || producto.Precio || "0");
 
   const tallasDisponibles = obtenerTallas(tallaTexto);
   let tallaElegida = tallaTexto;
@@ -150,60 +138,52 @@ function agregarAlCarrito(index) {
     }
   }
 
-  const item = {
+  carrito.push({
     categoria,
     nombre,
     talla: tallaElegida,
     precio
-  };
+  });
 
-  carrito.push(item);
-  localStorage.setItem("carrito", JSON.stringify(carrito));
-
+  guardarCarrito();
   actualizarCarrito();
   animarCarrito();
 }
 
-  let tallaElegida = tallaTexto;
+function actualizarCarrito() {
+  const lista = document.getElementById("lista-carrito");
+  const totalHTML = document.getElementById("total");
+  const contador = document.getElementById("contador-carrito");
 
-  const tallasDisponibles = tallaTexto
-    .replace("Talla", "")
-    .replace("TALLA", "")
-    .replace(":", "")
-    .trim()
-    .split(/\s+/)
-    .filter(t => t !== "");
+  if (!lista || !totalHTML || !contador) return;
 
-  if (tallasDisponibles.length > 1 && !tallaTexto.toLowerCase().includes("única") && !tallaTexto.toLowerCase().includes("unica")) {
-    tallaElegida = prompt(`Elige una talla para ${nombre}:\n${tallasDisponibles.join(", ")}`);
+  lista.innerHTML = "";
 
-    if (!tallaElegida) {
-      alert("Debes elegir una talla para agregar el producto.");
-      return;
-    }
-
-    tallaElegida = tallaElegida.toUpperCase();
-
-    if (!tallasDisponibles.map(t => t.toUpperCase()).includes(tallaElegida)) {
-      alert("Talla no válida. Elige una de estas: " + tallasDisponibles.join(", "));
-      return;
-    }
+  if (carrito.length === 0) {
+    lista.innerHTML = `<li class="carrito-vacio">Tu carrito está vacío.</li>`;
   }
 
-  const item = {
-    categoria,
-    nombre,
-    talla: tallaElegida,
-    precio,
-  };
+  let total = 0;
 
-  carrito.push(item);
-  localStorage.setItem("carrito", JSON.stringify(carrito));
+  carrito.forEach((item, i) => {
+    total += Number(item.precio);
 
-  actualizarCarrito();
-  animarCarrito();
+    const li = document.createElement("li");
+    li.classList.add("item-carrito");
+
+    li.innerHTML = `
+      <strong>${i + 1}. ${item.nombre}</strong>
+      <small>Categoría: ${item.categoria}</small>
+      <small>Talla: ${item.talla}</small>
+      <small>Precio: $${formatearPrecio(item.precio)}</small>
+    `;
+
+    lista.appendChild(li);
+  });
+
+  totalHTML.textContent = formatearPrecio(total);
+  contador.textContent = carrito.length;
 }
-
 
 function abrirCarrito() {
   document.getElementById("carrito")?.classList.add("activo");
@@ -226,7 +206,7 @@ function animarCarrito() {
 
 function vaciarCarrito() {
   carrito = [];
-  localStorage.removeItem("carrito");
+  guardarCarrito();
   actualizarCarrito();
 }
 
@@ -240,7 +220,8 @@ function pagarWhatsApp() {
   let detalle = "Hola, quiero hacer este pedido:\n\n";
 
   carrito.forEach((item, i) => {
-    total += item.precio;
+    total += Number(item.precio);
+
     detalle += `${i + 1}. ${item.nombre}\n`;
     detalle += `Categoría: ${item.categoria}\n`;
     detalle += `Talla: ${item.talla}\n`;
@@ -253,39 +234,6 @@ function pagarWhatsApp() {
   window.open(`https://wa.me/${TELEFONO_WHATSAPP}?text=${mensaje}`, "_blank");
 }
 
-function formatearPrecio(valor) {
-  return Number(valor).toLocaleString("es-CO");
-}
-function abrirImagen(src) {
-
-  const modal = document.getElementById("modal-imagen");
-  const imagen = document.getElementById("imagen-modal");
-
-  imagen.src = src;
-
-  modal.classList.add("activo");
-}
-
-function cerrarImagen() {
-
-  document
-    .getElementById("modal-imagen")
-    .classList.remove("activo");
-}
-
-document
-  .getElementById("cerrar-modal")
-  ?.addEventListener("click", cerrarImagen);
-
-document
-  .getElementById("modal-imagen")
-  ?.addEventListener("click", (e) => {
-
-    if (e.target.id === "modal-imagen") {
-      cerrarImagen();
-    }
-
-  });
 function abrirImagen(src) {
   const modal = document.getElementById("modal-imagen");
   const imagenModal = document.getElementById("imagen-modal");
@@ -297,23 +245,13 @@ function abrirImagen(src) {
 }
 
 function cerrarImagen() {
-  const modal = document.getElementById("modal-imagen");
-  if (modal) modal.classList.remove("activo");
+  document.getElementById("modal-imagen")?.classList.remove("activo");
 }
 
-document.addEventListener("click", (e) => {
-  if (e.target.id === "cerrar-modal" || e.target.id === "modal-imagen") {
-    cerrarImagen();
-  }
-});
 function filtrarProductos(categoriaFiltro) {
   const botones = document.querySelectorAll(".filtro");
 
-  botones.forEach((btn) => btn.classList.remove("activo"));
-
-  const botonActivo = [...botones].find((btn) =>
-    btn.textContent.trim().toLowerCase() === categoriaFiltro.toLowerCase()
-  );
+  botones.forEach(btn => btn.classList.remove("activo"));
 
   if (categoriaFiltro === "todos") {
     document.querySelector(".filtro")?.classList.add("activo");
@@ -321,21 +259,27 @@ function filtrarProductos(categoriaFiltro) {
     return;
   }
 
+  const botonActivo = [...botones].find(btn =>
+    normalizarTexto(btn.textContent) === normalizarTexto(categoriaFiltro)
+  );
+
   if (botonActivo) botonActivo.classList.add("activo");
 
-  const filtrados = productos.filter((producto) => {
+  const filtrados = productos.filter(producto => {
     const categoria = producto.categoria || producto.Categoria || "";
-    return categoria.toLowerCase().includes(categoriaFiltro.toLowerCase());
+    return normalizarTexto(categoria).includes(normalizarTexto(categoriaFiltro));
   });
 
   mostrarProductos(filtrados);
 }
+
 function obtenerTallas(tallaTexto) {
   if (!tallaTexto) return [];
 
   const texto = tallaTexto
     .toString()
     .replace(/TALLA/gi, "")
+    .replace(/Talla/gi, "")
     .replace(/:/g, "")
     .trim();
 
@@ -360,5 +304,22 @@ function convertirPrecio(precioTexto) {
       .replace(/\./g, "")
       .replace(",", "")
       .trim()
-  );
+  ) || 0;
+}
+
+function formatearPrecio(valor) {
+  return Number(valor || 0).toLocaleString("es-CO");
+}
+
+function guardarCarrito() {
+  localStorage.setItem("carrito", JSON.stringify(carrito));
+}
+
+function normalizarTexto(texto) {
+  return texto
+    .toString()
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 }
