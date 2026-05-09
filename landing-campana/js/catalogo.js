@@ -121,10 +121,48 @@ function mostrarProductos(lista) {
 function agregarAlCarrito(index) {
   const producto = productos[index];
 
+  const categoria = producto.categoria || producto.Categoria || "";
+  const nombre = producto.nombre || producto.Nombre || `Producto ${index + 1}`;
+  const tallaTexto = producto.talla || producto.Talla || "";
+
+  const precioTexto = producto.precio || producto.Precio || "0";
+  const precio = Number(
+    precioTexto
+      .replace("$", "")
+      .replace(/\./g, "")
+      .replace(",", "")
+  );
+
+  let tallaElegida = tallaTexto;
+
+  const tallasDisponibles = tallaTexto
+    .replace("Talla", "")
+    .replace("TALLA", "")
+    .replace(":", "")
+    .trim()
+    .split(/\s+/)
+    .filter(t => t !== "");
+
+  if (tallasDisponibles.length > 1 && !tallaTexto.toLowerCase().includes("única") && !tallaTexto.toLowerCase().includes("unica")) {
+    tallaElegida = prompt(`Elige una talla para ${nombre}:\n${tallasDisponibles.join(", ")}`);
+
+    if (!tallaElegida) {
+      alert("Debes elegir una talla para agregar el producto.");
+      return;
+    }
+
+    tallaElegida = tallaElegida.toUpperCase();
+
+    if (!tallasDisponibles.map(t => t.toUpperCase()).includes(tallaElegida)) {
+      alert("Talla no válida. Elige una de estas: " + tallasDisponibles.join(", "));
+      return;
+    }
+  }
+
   const item = {
-    categoria: producto.categoria || producto.Categoria || "",
-    nombre: producto.nombre || producto.Nombre || `Producto ${index + 1}`,
-    talla: producto.talla || producto.Talla || "",
+    categoria,
+    nombre,
+    talla: tallaElegida,
     precio,
   };
 
@@ -135,40 +173,6 @@ function agregarAlCarrito(index) {
   animarCarrito();
 }
 
-function actualizarCarrito() {
-  const lista = document.getElementById("lista-carrito");
-  const totalHTML = document.getElementById("total");
-  const contador = document.getElementById("contador-carrito");
-
-  if (!lista || !totalHTML || !contador) return;
-
-  lista.innerHTML = "";
-
-  if (carrito.length === 0) {
-    lista.innerHTML = `<li class="carrito-vacio">Tu carrito está vacío.</li>`;
-  }
-
-  let total = 0;
-
-  carrito.forEach((item, i) => {
-    total += item.precio;
-
-    const li = document.createElement("li");
-    li.classList.add("item-carrito");
-
-    li.innerHTML = `
-      <strong>${i + 1}. ${item.nombre}</strong>
-      <small>Categoría: ${item.categoria}</small>
-      <small>Talla: ${item.talla}</small>
-      <small>Precio: $${formatearPrecio(item.precio)}</small>
-    `;
-
-    lista.appendChild(li);
-  });
-
-  totalHTML.textContent = formatearPrecio(total);
-  contador.textContent = carrito.length;
-}
 
 function abrirCarrito() {
   document.getElementById("carrito")?.classList.add("activo");
