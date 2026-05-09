@@ -56,9 +56,16 @@ function mostrarProductos(lista) {
     const categoria = producto.categoria || producto.Categoria || "";
     const nombre = producto.nombre || producto.Nombre || `Producto ${index + 1}`;
     const talla = producto.talla || producto.Talla || "";
-    const precio = Number(producto.precio || producto.precio || 0);
+    const precioTexto = producto.precio || producto.Precio || "0";
+
+    const precio = Number(
+      precioTexto
+        .replace("$", "")
+        .replace(/\./g, "")
+        .replace(",", "")
+    );
     const imagen = producto.imagen || producto.Imagen || "";
-    
+
 
     const card = document.createElement("div");
     card.classList.add("producto-card");
@@ -100,7 +107,7 @@ function agregarAlCarrito(index) {
     categoria: producto.categoria || producto.Categoria || "",
     nombre: producto.nombre || producto.Nombre || `Producto ${index + 1}`,
     talla: producto.talla || producto.Talla || "",
-    precio: Number(producto.precio || producto.precio || 0),
+    precio,
   };
 
   carrito.push(item);
@@ -226,7 +233,7 @@ document
     }
 
   });
-  function abrirImagen(src){
+function abrirImagen(src) {
   const modal = document.getElementById("modal-imagen");
   const imagenModal = document.getElementById("imagen-modal");
 
@@ -236,7 +243,7 @@ document
   modal.classList.add("activo");
 }
 
-function cerrarImagen(){
+function cerrarImagen() {
   const modal = document.getElementById("modal-imagen");
   if (modal) modal.classList.remove("activo");
 }
