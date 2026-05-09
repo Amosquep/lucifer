@@ -73,7 +73,15 @@ function mostrarProductos(lista) {
     console.log(producto);
     const categoria = producto.categoria || producto.Categoria || "";
     const nombre = producto.nombre || producto.Nombre || `Producto ${index + 1}`;
-    const talla = producto.talla || producto.Talla || "";
+    const tallasDisponibles = obtenerTallas(talla);
+    const selectorTallas = tallasDisponibles.length > 1
+      ? `
+    <select class="select-talla" id="talla-${index}">
+      <option value="">Elige tu talla</option>
+      ${tallasDisponibles.map(t => `<option value="${t}">${t}</option>`).join("")}
+    </select>
+  `
+      : "";
     const precioTexto = producto.precio || producto.Precio || "0";
 
     const precio = Number(
@@ -103,12 +111,13 @@ function mostrarProductos(lista) {
         <span class="producto-categoria">${categoria}</span>
         <h3>${nombre}</h3>
         <p><strong>Talla:</strong> ${talla}</p>
+        ${selectorTallas}
         <p class="producto-precio">$${formatearPrecio(precio)}</p>
 
         <button 
           type="button"
           class="btn-agregar"
-          onclick="event.stopPropagation(); agregarAlCarrito(${index})"
+          onclick="event.stopPropagation(); agregarAlCarrito(${index})">
           Agregar al carrito
         </button>
       </div>
@@ -126,12 +135,34 @@ function agregarAlCarrito(index) {
   const tallaTexto = producto.talla || producto.Talla || "";
 
   const precioTexto = producto.precio || producto.Precio || "0";
-  const precio = Number(
-    precioTexto
-      .replace("$", "")
-      .replace(/\./g, "")
-      .replace(",", "")
-  );
+  const precio = convertirPrecio(precioTexto);
+
+  const tallasDisponibles = obtenerTallas(tallaTexto);
+  let tallaElegida = tallaTexto;
+
+  if (tallasDisponibles.length > 1) {
+    const select = document.getElementById(`talla-${index}`);
+    tallaElegida = select ? select.value : "";
+
+    if (!tallaElegida) {
+      alert("Por favor elige una talla antes de agregar el producto.");
+      return;
+    }
+  }
+
+  const item = {
+    categoria,
+    nombre,
+    talla: tallaElegida,
+    precio
+  };
+
+  carrito.push(item);
+  localStorage.setItem("carrito", JSON.stringify(carrito));
+
+  actualizarCarrito();
+  animarCarrito();
+}
 
   let tallaElegida = tallaTexto;
 
@@ -298,4 +329,36 @@ function filtrarProductos(categoriaFiltro) {
   });
 
   mostrarProductos(filtrados);
+}
+function obtenerTallas(tallaTexto) {
+  if (!tallaTexto) return [];
+
+  const texto = tallaTexto
+    .toString()
+    .replace(/TALLA/gi, "")
+    .replace(/:/g, "")
+    .trim();
+
+  if (
+    texto.toLowerCase().includes("única") ||
+    texto.toLowerCase().includes("unica")
+  ) {
+    return [];
+  }
+
+  return texto
+    .split(/\s+/)
+    .map(t => t.trim().toUpperCase())
+    .filter(t => t !== "");
+}
+
+function convertirPrecio(precioTexto) {
+  return Number(
+    precioTexto
+      .toString()
+      .replace("$", "")
+      .replace(/\./g, "")
+      .replace(",", "")
+      .trim()
+  );
 }
