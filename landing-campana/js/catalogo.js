@@ -34,6 +34,24 @@ async function cargarProductos() {
     const hoja = workbook.Sheets[workbook.SheetNames[0]];
     productos = XLSX.utils.sheet_to_json(hoja);
 
+    productos.sort((a, b) => {
+
+      const orden = {
+        "Lencería": 1,
+        "Lenceria": 1,
+        "Pijamas": 2,
+        "Mallas": 3
+      };
+
+      const categoriaA = a.categoria || a.Categoria || "";
+      const categoriaB = b.categoria || b.Categoria || "";
+
+      return (orden[categoriaA] || 99) - (orden[categoriaB] || 99);
+
+    });
+
+    mostrarProductos(productos);
+
     mostrarProductos(productos);
   } catch (error) {
     console.error("Error cargando catálogo:", error);
