@@ -108,7 +108,7 @@ function mostrarProductos(lista) {
         <button 
           type="button"
           class="btn-agregar"
-          onclick="agregarAlCarrito(${index})">
+          onclick="event.stopPropagation(); agregarAlCarrito(${index})"
           Agregar al carrito
         </button>
       </div>
